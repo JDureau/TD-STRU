@@ -34,6 +34,22 @@ ssm.plot.hat <- function(hatpath,packagepath,plotdata=0){
 	multiplot(plotlist = ps, cols = 3)
 }
 
+
+ssm.plot.X <- function(Xpath,packagepath){
+  X <- as.data.frame(read.csv(paste(packagepath,Xpath,sep=""), header = TRUE))
+#  data <- import.data(packagepath)
+  names = names(X)
+#  X <- merge(X,data)
+  ps = list()
+  X$Date = as.Date(X$date)
+#  X$ObsDate = as.Date(X$obsdates)
+  for (i in 2:(length(names)-1)){
+    ps[[i-1]] = ggplot(X,aes_string(x='Date',y = names[i], group = "index")) + geom_line() 
+  }  
+  multiplot(plotlist = ps, cols = 3)
+}
+
+
 ssm.plot.trace <- function(tracepath,packagepath){
   trace <- as.data.frame(read.csv(paste(packagepath,tracepath,sep=""), header = TRUE))
 	ps = list()

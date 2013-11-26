@@ -1,7 +1,7 @@
 {
   "name": "sir",
-  "description": "SIR model",
-  "keywords": ["SIR", "epidemiology"],
+  "description": "SIR model, hypothetical epidemic in Paris, France",
+  "keywords": ["SIR", "epidemiology","simulated","Paris","France"]],
   "licenses": [
     {
       "type": "cc0",
@@ -63,17 +63,17 @@
     {
       "name": "S",
       "description": "Number of susceptible",
-      "data": { "distribution": "fixed", "value": 70000 }
+      "data": { "distribution": "fixed", "value": 157 }
     },
     {
       "name": "I",
       "description": "Number of infectious",
-      "data": { "distribution": "fixed", "value": 10 }
+      "data": { "distribution": "fixed", "value": 3 }
     },
     {
       "name": "R",
       "description": "Number of recovered",
-      "data": { "distribution": "fixed", "value": 929990 }
+      "data": { "distribution": "fixed", "value": 840 }
     },
     {
       "name": "r0",
@@ -83,13 +83,7 @@
     {
       "name": "pr_v",
       "description": "duration of infection",
-      "data": { 
-        "distribution": "normal", 
-        "mean": 12.5,
-        "sd": 3.8265, 
-        "lower": 0.0, 
-        "unit": "days"
-      }
+      "data": { "distribution": "uniform", "lower": 15.0, "upper": 100.0, "unit": "days"}
     },
     {
       "name": "rep",
@@ -101,7 +95,7 @@
       "format": "json",
       "data": {
         "r0": 25.0,
-        "pr_v": 11.0
+        "pr_v": 55.0
       }
     },
     {
