@@ -1,0 +1,399 @@
+{
+  "name": "ssm-plague-uk-1665-si-seas",
+  "version": "0.0.0",
+  "description": "SI model with seasonally forced transmission term and overdispersed binomial observation process",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/JDureau/ssm-plague-uk-1665-SI-seas.git"
+  },
+  "keywords": [
+    "SI",
+    "plague",
+    "london",
+    "eyam"
+  ],
+  "author": "Joseph Dureau",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JDureau/ssm-plague-uk-1665-si-seas/issues"
+  },
+  "homepage": "https://github.com/JDureau/ssm-plague-uk-1665-si-seas",
+  "model": {
+    "populations": [
+      {
+        "name": "london",
+        "composition": [
+          "S_london",
+          "I_london"
+        ]
+      },
+      {
+        "name": "eyam",
+        "composition": [
+          "S_eyam",
+          "I_eyam"
+        ]
+      }
+    ],
+    "reactions": [
+      {
+        "from": "S_london",
+        "to": "I_london",
+        "rate": "r0_london/(S_london+I_london+1)*(1+e*sin(2.0*PI*(t/365.0 + d)))*mu_d*I_london",
+        "description": "infection",
+        "keywords": [
+          "transmission"
+        ]
+      },
+      {
+        "from": "S_eyam",
+        "to": "I_eyam",
+        "rate": "r0_eyam/(S_eyam+I_eyam+1)*(1+e*sin(2.0*PI*(t/365.0 + d)))*mu_d*I_eyam",
+        "description": "infection",
+        "keywords": [
+          "transmission"
+        ]
+      },
+      {
+        "from": "I_london",
+        "to": "U",
+        "rate": "correct_rate(mu_d)",
+        "description": "death",
+        "tracked": [
+          "london_deaths"
+        ]
+      },
+      {
+        "from": "I_eyam",
+        "to": "U",
+        "rate": "correct_rate(mu_d)",
+        "description": "death",
+        "tracked": [
+          "eyam_deaths"
+        ]
+      }
+    ],
+    "observations": [
+      {
+        "name": "london_observed_deaths",
+        "start": "1665-05-01",
+        "distribution": "discretized_normal",
+        "mean": "rep_london * london_deaths",
+        "sd": "sqrt(rep_london * ( 1.0 - rep_london ) * london_deaths + pow( rep_london * phi * london_deaths, 2) )"
+      },
+      {
+        "name": "eyam_observed_deaths",
+        "start": "1665-05-01",
+        "distribution": "discretized_normal",
+        "mean": "rep_eyam * eyam_deaths",
+        "sd": "sqrt(rep_eyam * ( 1.0 - rep_eyam ) * eyam_deaths + pow( rep_eyam * phi * eyam_deaths, 2) )"
+      }
+    ],
+    "data": [
+      {
+        "name": "london_observed_deaths",
+        "data": [
+          {
+            "resource": "data",
+            "field": "date"
+          },
+          {
+            "resource": "data",
+            "field": "london_observed_deaths"
+          }
+        ]
+      },
+      {
+        "name": "eyam_observed_deaths",
+        "data": [
+          {
+            "resource": "data",
+            "field": "date"
+          },
+          {
+            "resource": "data",
+            "field": "eyam_observed_deaths"
+          }
+        ]
+      }
+    ],
+    "inputs": [
+      {
+        "name": "S_london",
+        "description": "Number of initially susceptibles in London",
+        "transformation": "pr_S_london*N_london",
+        "to_resource": "S_london/N_london",
+        "data": {
+          "resource": "pr_S_london"
+        }
+      },
+      {
+        "name": "S_eyam",
+        "description": "Number of initially susceptibles in Eyam",
+        "transformation": "pr_S_eyam*N_eyam",
+        "to_resource": "S_eyam/N_eyam",
+        "data": {
+          "resource": "pr_S_eyam"
+        }
+      },
+      {
+        "name": "I_london",
+        "description": "Number of initially infected in London",
+        "transformation": "N_london*(1 - pr_S_london)"
+      },
+      {
+        "name": "I_eyam",
+        "description": "Number of initially infected in Eyam",
+        "transformation": "N_eyam*(1 - pr_S_eyam)"
+      },
+      {
+        "name": "N_london",
+        "description": "Initial population size in London",
+        "data": {
+          "resource": "N_london"
+        }
+      },
+      {
+        "name": "N_eyam",
+        "description": "Initial population size in Eyam",
+        "data": {
+          "resource": "N_eyam"
+        }
+      },
+      {
+        "name": "e",
+        "description": "Seasonal forcing amplitude",
+        "data": {
+          "resource": "e"
+        }
+      },
+      {
+        "name": "d",
+        "description": "Seasonal forcing phase",
+        "data": {
+          "resource": "d"
+        }
+      },
+      {
+        "name": "r0_london",
+        "description": "Plague reproduction rate in London",
+        "data": {
+          "resource": "r0_london"
+        }
+      },
+      {
+        "name": "r0_eyam",
+        "description": "Plague reproduction rate in Eyam",
+        "data": {
+          "resource": "r0_eyam"
+        }
+      },
+      {
+        "name": "mu_d",
+        "description": "Death rate",
+        "transformation": "1/life_exp",
+        "to_resource": "1/mu_d",
+        "data": {
+          "resource": "life_exp"
+        }
+      },
+      {
+        "name": "rep_london",
+        "description": "Reporting rate in London",
+        "data": {
+          "resource": "rep_london"
+        }
+      },
+      {
+        "name": "rep_eyam",
+        "description": "Reporting rate in Eyam",
+        "data": {
+          "resource": "rep_eyam"
+        }
+      },
+      {
+        "name": "phi",
+        "description": "over-dispersion",
+        "data": {
+          "resource": "phi"
+        }
+      }
+    ]
+  },
+  "resources": [
+    {
+      "name": "data",
+      "path": "data/data.csv",
+      "format": "csv",
+      "schema": {
+        "fields": [
+          {
+            "name": "date",
+            "type": "date"
+          },
+          {
+            "name": "london_observed_deaths",
+            "type": "number"
+          },
+          {
+            "name": "eyam_observed_deaths",
+            "type": "number"
+          }
+        ]
+      }
+    },
+    {
+      "name": "pr_S_london",
+      "description": "Proportion of initially susceptibles in London",
+      "data": {
+        "distribution": "uniform",
+        "lower": 0.97,
+        "upper": 1
+      }
+    },
+    {
+      "name": "pr_S_eyam",
+      "description": "Proportion of initially susceptibles in eyam",
+      "data": {
+        "distribution": "uniform",
+        "lower": 0.97,
+        "upper": 1
+      }
+    },
+    {
+      "name": "N_london",
+      "description": "Initial population size in London",
+      "data": {
+        "distribution": "fixed",
+        "value": 460000
+      }
+    },
+    {
+      "name": "N_eyam",
+      "description": "Initial population size in Eyam",
+      "data": {
+        "distribution": "fixed",
+        "value": 350
+      }
+    },
+    {
+      "name": "e",
+      "description": "Seasonal forcing amplitude",
+      "data": {
+        "distribution": "uniform",
+        "lower": 0,
+        "upper": 1
+      }
+    },
+    {
+      "name": "d",
+      "description": "Seasonal forcing phase",
+      "data": {
+        "distribution": "uniform",
+        "lower": -1,
+        "upper": 1
+      }
+    },
+    {
+      "name": "r0_london",
+      "description": "Plague reproduction rate in London",
+      "data": {
+        "distribution": "uniform",
+        "lower": 0,
+        "upper": 15
+      }
+    },
+    {
+      "name": "r0_eyam",
+      "description": "Plague reproduction rate in eyam",
+      "data": {
+        "distribution": "uniform",
+        "lower": 0,
+        "upper": 15
+      }
+    },
+    {
+      "name": "life_exp",
+      "description": "Life expectancy with Plague",
+      "data": {
+        "distribution": "uniform",
+        "lower": 1,
+        "upper": 7
+      }
+    },
+    {
+      "name": "rep_london",
+      "description": "Reporting rate in London",
+      "data": {
+        "distribution": "uniform",
+        "lower": 0.5,
+        "upper": 1
+      }
+    },
+    {
+      "name": "rep_eyam",
+      "description": "Reporting rate in Eyam",
+      "data": {
+        "distribution": "uniform",
+        "lower": 0.5,
+        "upper": 1
+      }
+    },
+    {
+      "name": "phi",
+      "description": "over-dispersion",
+      "data": {
+        "distribution": "fixed",
+        "value": 0.1
+      }
+    },
+    {
+      "name": "values",
+      "format": "json",
+      "data": {
+        "pr_S_london": 0.998,
+        "pr_S_eyam": 0.997,
+        "e": 0.17,
+        "d": 0.58,
+        "r0_london": 1,
+        "r0_eyam": 0.8,
+        "life_exp": 5,
+        "rep_london": 0.98,
+        "rep_eyam": 0.9
+      }
+    },
+    {
+      "name": "covariance",
+      "format": "json",
+      "data": {
+        "pr_S_london": {
+          "pr_S_london": 0.02
+        },
+        "pr_S_eyam": {
+          "pr_S_eyam": 0.02
+        },
+        "e": {
+          "e": 0.02
+        },
+        "d": {
+          "d": 0.02
+        },
+        "r0_london": {
+          "r0_london": 0.02
+        },
+        "r0_eyam": {
+          "r0_eyam": 0.02
+        },
+        "life_exp": {
+          "life_exp": 0.02
+        },
+        "rep_london": {
+          "rep_london": 0.02
+        },
+        "rep_eyam": {
+          "rep_eyam": 0.02
+        }
+      }
+    }
+  ]
+}
