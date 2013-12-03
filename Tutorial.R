@@ -13,4 +13,4 @@ ROOT = getwd()
 # Set the path of your model
 pathSIRSAmiens = paste(ROOT,"/SIRS-Amiens",sep="")
 
-ssm.plot.X("/bin/X_0.csv",pathSIRAmiens);
+ssm.plot.hat("/bin/hat_0.csv",pathSIRAmiens);

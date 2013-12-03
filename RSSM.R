@@ -10,28 +10,57 @@ ssm.plot.hat <- function(hatpath,packagepath,plotdata=0){
   hat <- as.data.frame(read.csv(paste(packagepath,hatpath,sep=""), header = TRUE))
   data <- import.data(packagepath)
   names = names(hat)
+  datanames = names(data)
   hat <- merge(hat,data)
 	ps = list()
 	hat$Date = as.Date(hat$date)
-  hat$ObsDate = as.Date(hat$obsdates)
-	for (i in 1:((length(names)-2)/3) ){
+  nobs = ncol(data)-1
+	for (i in 1:((length(names)-1-nobs)/3) ){
 		ps[[i]] = ggplot(hat,aes_string(x='Date',y = names[3*(i-1)+2])) + geom_line() + 
       geom_ribbon(aes_string(ymin=names[3*(i-1)+3], ymax=names[3*(i-1)+4]),fill="skyblue",alpha=0.6) +
       ylab(substr(names[3*(i-1)+2],6,nchar(names[3*(i-1)+2])))
 	}	
-  i = ((length(names)-1)/3)
-  if (plotdata){
-  ps[[i]] = ggplot(hat,aes_string(x='Date',y = names[3*(i-1)+2])) + geom_line() + 
-    geom_ribbon(aes_string(ymin=names[3*(i-1)+3], ymax=names[3*(i-1)+4]),fill="skyblue",alpha=0.6) +
-    ylab(substr(names[3*(i-1)+2],6,nchar(names[3*(i-1)+2]))) + 
-    geom_point(aes_string(x='ObsDate', y='obsvalues'),color="chartreuse3")
-  } else {
-    ps[[i]] = ggplot(hat,aes_string(x='Date',y = names[3*(i-1)+2])) + geom_line() + 
-      geom_ribbon(aes_string(ymin=names[3*(i-1)+3], ymax=names[3*(i-1)+4]),fill="skyblue",alpha=0.6) +
-      ylab(substr(names[3*(i-1)+2],6,nchar(names[3*(i-1)+2]))) 
+  for (ind in 1:nobs){
+    i = ((length(names)-1-nobs*3)/3) + ind
+    if (plotdata){
+      ps[[i]] = ggplot(hat,aes_string(x='Date',y = names[3*(i-1)+2])) + geom_line() + 
+        geom_ribbon(aes_string(ymin=names[3*(i-1)+3], ymax=names[3*(i-1)+4]),fill="skyblue",alpha=0.6) +
+        ylab(substr(names[3*(i-1)+2],6,nchar(names[3*(i-1)+2]))) + 
+        geom_point(aes_string(x='Date', y=datanames[ind+1]),color="chartreuse3")
+    } else {
+      ps[[i]] = ggplot(hat,aes_string(x='Date',y = names[3*(i-1)+2])) + geom_line() + 
+        geom_ribbon(aes_string(ymin=names[3*(i-1)+3], ymax=names[3*(i-1)+4]),fill="skyblue",alpha=0.6) +
+        ylab(substr(names[3*(i-1)+2],6,nchar(names[3*(i-1)+2]))) 
+    }
   }
     
 	multiplot(plotlist = ps, cols = 3)
+}
+
+
+ssm.plot.X <- function(Xpath,packagepath,plotdata=0){
+  X <- as.data.frame(read.csv(paste(packagepath,Xpath,sep=""), header = TRUE))
+  data <- import.data(packagepath)
+  names = names(X)
+  datanames = names(data)
+  X <- merge(X,data)
+  ps = list()
+  X$Date = as.Date(X$date)
+  nobs = ncol(data)-1
+  for (i in 1:(length(names)-2-nobs*2) ){
+    ps[[i]] = ggplot(X,aes_string(x='Date',y = names[i+1], group = "index")) + geom_line() 
+  }	
+  for (ind in 1:nobs){
+    i = (length(names)-2-nobs*2) + ind
+    if (plotdata){
+      ps[[i]] = ggplot(X,aes_string(x='Date',y = names[i+1], group = "index")) + geom_line() + 
+        geom_point(aes_string(x='Date', y=datanames[ind+1]),color="chartreuse3")
+    } else {
+      ps[[i]] = ggplot(X,aes_string(x='Date',y = names[i+1], group = "index")) + geom_line() 
+    }
+  }
+  
+  multiplot(plotlist = ps, cols = 3)
 }
 
 
@@ -68,7 +97,7 @@ ssm.plot.post <- function(tracepath,packagepath){
 	ps = list()
 	names = names(trace)
 	for (i in 1:((length(names)-1)) ){
-		ps[[i]] = ggplot(trace, aes_string(x = names[i])) +  geom_density(alpha=.2, fill="#FF6666") 
+		ps[[i]] = ggplot(trace, aes_string(x = names[i])) +  geom_density(alpha=.2, fill="#FF6666",adjust=3) 
 	}
 	multiplot(plotlist = ps, cols = 3)
 }
@@ -92,15 +121,26 @@ ssm.plot.scatter <- function(tracepath,packagepath){
 import.data <- function(packagepath){
   json_file <- fromJSON(paste(packagepath,'/bin/.data.json',sep=""))
   dates = rep('',length(json_file$data)-1)
-  values = rep(0,length(json_file$data)-1)
+  values = list()
+  nmax  = 0
   for (i in 1:(length(json_file$data)-1)){
-    dates[i] = json_file$data[[i]]$date
-    if (length(json_file$data[[i]]$values)>0){
-      values[i] = json_file$data[[i]]$values*1.0
-    } else 
-      values[i] = NaN
+    nmax = max(nmax,length(json_file$data[[i]]$observed))
+  }    
+  for (i in 1:(length(json_file$data)-1)){
+    if(i == 1){
+      data = data.frame(date=NaN)
+      for (j in 1:nmax){
+        data[paste('obs',as.character(j),sep='')] = NaN 
+      }
+    } else {
+      data = rbind(data,rep(NaN,nmax+1))
+    }
+    data[i,1] = json_file$data[[i]]$date
+    for(j in 1:length(json_file$data[[i]]$observed)){
+      data[i,json_file$data[[i]]$observed[j]+2] = json_file$data[[i]]$values[j]*1.0
+    } 
   }
-  return(data.frame(obsdates=dates,obsvalues=values))
+  return(data)
 }
 
 
