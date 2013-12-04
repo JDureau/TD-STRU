@@ -11,6 +11,12 @@ source('RSSM.R')
 ROOT = getwd() 
 
 # Set the path of your model
+pathSIRAmiens = paste(ROOT,"/SIR-Amiens",sep="")
 pathSIRSAmiens = paste(ROOT,"/SIRS-Amiens",sep="")
 
-ssm.plot.hat("/bin/hat_0.csv",pathSIRAmiens);
+
+
+
+ssm.plot.X("/bin/X_1.csv",pathSIRAmiens);
+ssm.plot.hat("/bin/hat_1.csv",pathSIRAmiens,0);
+ssm.plot.trace("/bin/trace_0.csv",pathSIseas);

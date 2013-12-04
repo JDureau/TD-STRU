@@ -38,7 +38,8 @@ ssm.plot.hat <- function(hatpath,packagepath,plotdata=0){
 }
 
 
-ssm.plot.X <- function(Xpath,packagepath,plotdata=0){
+ssm.plot.X <- function(Xpath,packagepath,plotdata=0){	
+	print('you')
   X <- as.data.frame(read.csv(paste(packagepath,Xpath,sep=""), header = TRUE))
   data <- import.data(packagepath)
   names = names(X)
