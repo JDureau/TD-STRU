@@ -28,11 +28,7 @@
           "I12",
           "I21",
           "R"
-        ],
-        "remainder": {
-          "name": "R",
-          "pop_size": "N"
-        }
+        ]
       }
     ],
     "reactions": [
@@ -45,13 +41,13 @@
       {
         "from": "S",
         "to": "I1",
-        "rate": "beta*(1+e*mintemp/29)*(I1/N+i+psi*I21/N)",
+        "rate": "beta/N*(1+e*sin(2.0*PI*(t/365.0 + d)))*(I1+i+psi*I21)",
         "description": "infection with strain 1"
       },
       {
         "from": "S",
         "to": "I2",
-        "rate": "beta*(1+e*mintemp/29)*(I2/N+i+psi*I12/N)",
+        "rate": "beta/N*(1+e*sin(2.0*PI*(t/365.0 + d)))*(I2+i+psi*I12)",
         "description": "infection with strain 2"
       },
       {
@@ -81,7 +77,7 @@
       {
         "from": "S1",
         "to": "I12",
-        "rate": "beta*(1+e*mintemp/29)*(I2/N+i+psi*I12/N)",
+        "rate": "beta/N*(1+e*sin(2.0*PI*(t/365.0 + d)))*(I2+i+psi*I12)",
         "description": "reinfection",
         "tracked": [
           "Inc"
@@ -90,7 +86,7 @@
       {
         "from": "S2",
         "to": "I21",
-        "rate": "beta*(1+e*mintemp/29)*(I1/N+i+psi*I21/N)",
+        "rate": "beta/N*(1+e*sin(2.0*PI*(t/365.0 + d)))*(I1+i+psi*I21)",
         "description": "reinfection",
         "tracked": [
           "Inc"
@@ -158,6 +154,12 @@
       },
       {
         "from": "I21",
+        "to": "U",
+        "rate": "mu_d",
+        "description": "death"
+      },
+      {
+        "from": "R",
         "to": "U",
         "rate": "mu_d",
         "description": "death"
@@ -271,8 +273,10 @@
         "name": "i",
         "description": "immigration",
         "data": {
-          "resource": "i"
-        }
+          "resource": "pr_i"
+        },
+        "transformation": "pow(10,pr_i)",
+        "to_resource": "log(i)/log(10)"
       },
       {
         "name": "gamma",
@@ -281,7 +285,7 @@
           "resource": "gamma_inv"
         },
         "transformation": "1/gamma_inv",
-        "to-resource": "1/gamma"
+        "to_resource": "1/gamma"
       },
       {
         "name": "alpha",
@@ -290,7 +294,7 @@
           "resource": "alpha_inv"
         },
         "transformation": "1/alpha_inv",
-        "to-resource": "1/alpha"
+        "to_resource": "1/alpha"
       },
       {
         "name": "e",
@@ -301,7 +305,7 @@
       },
       {
         "name": "d",
-        "description": "phase of seasonal forcing",
+        "description": "Seasonal forcing phase",
         "data": {
           "resource": "d"
         }
@@ -313,7 +317,7 @@
           "resource": "pr_S"
         },
         "transformation": "pr_S*N",
-        "to-resource": "S/N"
+        "to_resource": "S/N"
       },
       {
         "name": "I1",
@@ -322,7 +326,7 @@
           "resource": "pr_I1"
         },
         "transformation": "pr_I1*N",
-        "to-resource": "I1/N"
+        "to_resource": "I1/N"
       },
       {
         "name": "I2",
@@ -331,7 +335,7 @@
           "resource": "pr_I2"
         },
         "transformation": "pr_I2*N",
-        "to-resource": "I2/N"
+        "to_resource": "I2/N"
       },
       {
         "name": "R1",
@@ -340,7 +344,7 @@
           "resource": "pr_R1"
         },
         "transformation": "pr_R1*N",
-        "to-resource": "R1/N"
+        "to_resource": "R1/N"
       },
       {
         "name": "R2",
@@ -349,7 +353,7 @@
           "resource": "pr_R2"
         },
         "transformation": "pr_R2*N",
-        "to-resource": "R2/N"
+        "to_resource": "R2/N"
       },
       {
         "name": "S1",
@@ -358,7 +362,7 @@
           "resource": "pr_S1"
         },
         "transformation": "pr_S1*N",
-        "to-resource": "S1/N"
+        "to_resource": "S1/N"
       },
       {
         "name": "S2",
@@ -367,7 +371,7 @@
           "resource": "pr_S2"
         },
         "transformation": "pr_S2*N",
-        "to-resource": "S2/N"
+        "to_resource": "S2/N"
       },
       {
         "name": "I12",
@@ -376,7 +380,7 @@
           "resource": "pr_I12"
         },
         "transformation": "pr_I12*N",
-        "to-resource": "I12/N"
+        "to_resource": "I12/N"
       },
       {
         "name": "I21",
@@ -384,8 +388,8 @@
         "data": {
           "resource": "pr_I21"
         },
-        "transformation": "pr_S*N",
-        "to-resource": "I21/N"
+        "transformation": "pr_I21*N",
+        "to_resource": "I21/N"
       },
       {
         "name": "R",
@@ -492,7 +496,7 @@
       "data": {
         "distribution": "uniform",
         "lower": 0,
-        "upper": 0.2
+        "upper": 0.6
       }
     },
     {
@@ -501,7 +505,7 @@
       "data": {
         "distribution": "uniform",
         "lower": 1e-8,
-        "upper": 0.001
+        "upper": 0.01
       }
     },
     {
@@ -510,7 +514,7 @@
       "data": {
         "distribution": "uniform",
         "lower": 1e-8,
-        "upper": 0.001
+        "upper": 0.01
       }
     },
     {
@@ -518,8 +522,8 @@
       "description": "initial size of R1",
       "data": {
         "distribution": "uniform",
-        "lower": 0,
-        "upper": 0.1
+        "lower": 0.01,
+        "upper": 0.2
       }
     },
     {
@@ -527,8 +531,8 @@
       "description": "initial size of R2",
       "data": {
         "distribution": "uniform",
-        "lower": 0,
-        "upper": 0.1
+        "lower": 0.01,
+        "upper": 0.2
       }
     },
     {
@@ -537,7 +541,7 @@
       "data": {
         "distribution": "uniform",
         "lower": 0,
-        "upper": 0.3
+        "upper": 0.2
       }
     },
     {
@@ -546,7 +550,7 @@
       "data": {
         "distribution": "uniform",
         "lower": 0,
-        "upper": 0.3
+        "upper": 0.2
       }
     },
     {
@@ -600,22 +604,21 @@
       }
     },
     {
-      "name": "i",
+      "name": "pr_i",
       "description": "immigration rate",
       "data": {
         "distribution": "uniform",
-        "lower": 1e-8,
-        "upper": 0.001
+        "lower": 1,
+        "upper": 10
       }
     },
     {
       "name": "gamma_inv",
       "description": "inverse of recovery rate",
       "data": {
-        "distribution": "normal",
-        "mean": 6,
-        "sd": 1.5,
+        "distribution": "uniform",
         "lower": 0,
+        "upper": 20,
         "unit": "days"
       }
     },
@@ -623,10 +626,9 @@
       "name": "alpha_inv",
       "description": "cross immunity duration",
       "data": {
-        "distribution": "normal",
-        "mean": 300,
-        "sd": 32.5,
-        "lower": 0,
+        "distribution": "uniform",
+        "upper": 1200,
+        "lower": 60,
         "unit": "days"
       }
     },
@@ -641,7 +643,7 @@
     },
     {
       "name": "d",
-      "description": "seasonal forcing phase",
+      "description": "Seasonal forcing phase",
       "data": {
         "distribution": "uniform",
         "lower": -1,
@@ -668,30 +670,28 @@
       "name": "rep",
       "description": "over-dispersion",
       "data": {
-        "distribution": "uniform",
-        "lower": 0,
-        "upper": 1
+        "distribution": "fixed",
+        "value": 0.8
       }
     },
     {
       "name": "values",
       "format": "json",
       "data": {
-        "pr_S": 0.3,
+        "pr_S": 0.1,
         "pr_I1": 0.000001,
         "pr_I2": 0.000001,
-        "pr_S1": 0.3,
-        "pr_S2": 0.3,
+        "pr_S1": 0.1,
+        "pr_S2": 0.1,
         "pr_R1": 0.01,
         "pr_R2": 0.01,
         "beta": 6,
         "psi": 0.95,
-        "i": 0.000001,
+        "pr_i": 6,
+        "d": 0.58,
         "gamma_inv": 3.7,
         "alpha_inv": 180,
-        "e": 0.17,
-        "d": 0.58,
-        "rep": 0.7
+        "e": 0.17
       }
     },
     {
@@ -719,14 +719,17 @@
         "pr_R2": {
           "pr_R2": 0.04
         },
+        "d": {
+          "d": 0.02
+        },
         "beta": {
           "beta": 0.04
         },
         "psi": {
           "psi": 0.04
         },
-        "i": {
-          "i": 0.04
+        "pr_i": {
+          "pr_i": 0.04
         },
         "gamma_inv": {
           "gamma_inv": 0.04
@@ -736,14 +739,289 @@
         },
         "e": {
           "e": 0.02
-        },
-        "d": {
-          "d": 0.02
-        },
-        "rep": {
-          "rep": 0.02
         }
       }
+    },
+    {
+      "name": "lhs",
+      "path": "./results/lhs/lhs.json",
+      "format": "json"
+    },
+    {
+      "name": "start_pmcmc",
+      "path": "./results/lhs_simplex/start_pmcmc.json",
+      "format": "json"
+    },
+    {
+      "name": "pmcmc_map_0",
+      "path": "./results/pmcmc/map_0.json",
+      "format": "json"
+    },
+    {
+      "name": "pmcmc_map_1",
+      "path": "./results/pmcmc/map_1.json",
+      "format": "json"
+    },
+    {
+      "name": "pmcmc_trace",
+      "path": "./results/pmcmc/trace.csv",
+      "format": "csv"
+    },
+    {
+      "name": "pmcmc_traj",
+      "path": "./results/pmcmc/X.csv",
+      "format": "csv"
+    },
+    {
+      "name": "pmcmc_map",
+      "path": "./results/pmcmc/map.json",
+      "format": "json"
+    },
+    {
+      "name": "predict",
+      "path": "./results/predict/X_0.csv",
+      "format": "csv"
+    }
+  ],
+  "analytics": [
+    {
+      "name": "random-lhs",
+      "run": [
+        {
+          "command": "ssm lhs $IN.dpkg -o $OUT.out --samples 50",
+          "timeout": "00:01:00",
+          "inputs": [
+            {
+              "path": "package.json",
+              "name": "dpkg"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "results/lhs/lhs.json",
+              "save": {
+                "resource": "lhs"
+              },
+              "name": "out"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "lhs-simplex",
+      "map": [
+        {
+          "command": "./simul",
+          "args": [
+            "--root",
+            "$ROOT/results/lhs_simplex",
+            "--next",
+            "mle_",
+            "--id",
+            "$ID",
+            "--end",
+            "2100-01-01"
+          ],
+          "cwd": "bin",
+          "timeout": "00:01:00",
+          "inputs": [
+            {
+              "resource": "lhs",
+              "collection": true,
+              "stdin": true
+            }
+          ],
+          "outputs": [
+            {
+              "path": "results/lhs_simplex/mle_*.json"
+            }
+          ]
+        },
+        {
+          "repeat": 3,
+          "command": "./simplex",
+          "args": [
+            "--root",
+            "$ROOT/results/lhs_simplex",
+            "-M",
+            10000,
+            "--next",
+            "mle_",
+            "--id",
+            "$ID",
+            "--prior"
+          ],
+          "cwd": "bin",
+          "timeout": "00:01:00",
+          "inputs": [
+            {
+              "path": "results/lhs_simplex/mle_*.json",
+              "stdin": true
+            }
+          ],
+          "outputs": [
+            {
+              "path": "results/lhs_simplex/mle_*.json"
+            }
+          ]
+        }
+      ],
+      "reduce": [
+        {
+          "command": "ssm reduce $ROOT/results/lhs_simplex --by log_ltp --summary $OUT.out",
+          "timeout": "00:01:00",
+          "inputs": [
+            {
+              "path": "results/lhs_simplex/mle_*.json"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "results/lhs_simplex/start_pmcmc.json",
+              "save": {
+                "resource": "start_pmcmc"
+              },
+              "name": "out"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pmcmc",
+      "map": [
+        {
+          "command": "./pmcmc",
+          "args": [
+            "--root",
+            "$ROOT/results/pmcmc",
+            "-M",
+            100000,
+            "--next",
+            "map_",
+            "--id",
+            "$ID"
+          ],
+          "cwd": "bin",
+          "timeout": "01:00:00",
+          "inputs": [
+            {
+              "resource": "start_pmcmc",
+              "replicate": 2,
+              "stdin": true
+            }
+          ],
+          "outputs": [
+            {
+              "path": "results/pmcmc/map_*.json"
+            }
+          ]
+        },
+        {
+          "command": "./pmcmc",
+          "args": [
+            "--root",
+            "$ROOT/results/pmcmc",
+            "-M",
+            100000,
+            "--next",
+            "map_",
+            "--id",
+            "$ID",
+            "--trace",
+            "--traj"
+          ],
+          "cwd": "bin",
+          "timeout": "01:00:00",
+          "inputs": [
+            {
+              "path": "results/pmcmc/map_*.json",
+              "stdin": true
+            }
+          ],
+          "outputs": [
+            {
+              "path": "results/pmcmc/map_*.json",
+              "save": {
+                "resource": "pmcmc_map_*"
+              }
+            },
+            {
+              "path": "results/pmcmc/trace_*.csv"
+            },
+            {
+              "path": "results/pmcmc/X_*.csv"
+            }
+          ]
+        }
+      ],
+      "reduce": [
+        {
+          "command": "ssm reduce $ROOT/results/pmcmc --by DIC --trace $OUT.trace --traj $OUT.traj --summary $OUT.map",
+          "timeout": "01:00:00",
+          "inputs": [
+            {
+              "resource": "pmcmc_map_*"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "results/pmcmc/trace.csv",
+              "save": {
+                "resource": "pmcmc_trace"
+              },
+              "name": "trace"
+            },
+            {
+              "path": "results/pmcmc/X.csv",
+              "save": {
+                "resource": "pmcmc_traj"
+              },
+              "name": "traj"
+            },
+            {
+              "path": "results/pmcmc/map.json",
+              "save": {
+                "resource": "pmcmc_map"
+              },
+              "name": "map"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "predict",
+      "run": [
+        {
+          "command": "ssm predict $IN.dpkg $IN.traj $IN.trace 2012-12-01 | ./simul --root $ROOT/results/predict --traj --start 2012-12-01 --end 2013-12-01",
+          "cwd": "bin",
+          "timeout": "00:00:00",
+          "inputs": [
+            {
+              "path": "package.json",
+              "name": "dpkg"
+            },
+            {
+              "resource": "pmcmc_traj",
+              "name": "traj"
+            },
+            {
+              "resource": "pmcmc_trace",
+              "name": "trace"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "results/predict/X_0.csv",
+              "save": {
+                "resource": "predict"
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }

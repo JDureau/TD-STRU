@@ -1,0 +1,640 @@
+{
+  "name": "dengue-2strains",
+  "description": "2 strains Dengue model introduced in Aguiar, M., Ballesteros, S., Kooi, B. W., & Stollenwerk, N. (2011). The role of seasonality and import in a minimalistic multi-strain dengue model capturing differences between primary and secondary infections: complex dynamics and its implications for data analysis.",
+  "keywords": [
+    "2-strains",
+    "epidemiology",
+    "Thailand"
+  ],
+  "licenses": [
+    {
+      "type": "cc0",
+      "url": "http://creativecommons.org/publicdomain/zero/1.0/"
+    }
+  ],
+  "version": "0.0.0",
+  "model": {
+    "populations": [
+      {
+        "name": "Chaiyaphum",
+        "composition": [
+          "S",
+          "I",
+          "R"
+        ],
+        "remainder": {
+          "name": "R",
+          "pop_size": "N"
+        }
+      }
+    ],
+    "reactions": [
+      {
+        "from": "U",
+        "to": "S",
+        "rate": "mu_b*N",
+        "description": "birth"
+      },
+      {
+        "from": "S",
+        "to": "I",
+        "rate": "beta/N*(1+e*sin(2.0*PI*(t/365.0 + d)))*(I+i)",
+        "description": "infection",
+        "tracked": [
+          "Inc"
+        ]
+      },
+      {
+        "from": "I",
+        "to": "R",
+        "rate": "gamma",
+        "description": "recovery"
+      },
+      {
+        "from": "R",
+        "to": "S",
+        "rate": "alpha",
+        "description": "loss of immunity"
+      },
+      {
+        "from": "S",
+        "to": "U",
+        "rate": "mu_d",
+        "description": "death"
+      },
+      {
+        "from": "I",
+        "to": "U",
+        "rate": "mu_d",
+        "description": "death"
+      },
+      {
+        "from": "R",
+        "to": "U",
+        "rate": "mu_d",
+        "description": "death"
+      }
+    ],
+    "observations": [
+      {
+        "name": "dataEpi",
+        "start": "1981-12-01",
+        "distribution": "discretized_normal",
+        "mean": "rep * Inc",
+        "sd": "sqrt(rep * ( 1.0 - rep ) * Inc + pow(rep*phi*Inc,2) )"
+      }
+    ],
+    "data": [
+      {
+        "name": "dataEpi",
+        "data": [
+          {
+            "resource": "dataEpi",
+            "field": "date"
+          },
+          {
+            "resource": "dataEpi",
+            "field": "Chaiyaphum"
+          }
+        ]
+      }
+    ],
+    "inputs": [
+      {
+        "name": "N",
+        "data": [
+          {
+            "resource": "dataPop",
+            "field": "date"
+          },
+          {
+            "resource": "dataPop",
+            "field": "Chaiyaphum"
+          }
+        ]
+      },
+      {
+        "name": "maxtemp",
+        "data": [
+          {
+            "resource": "dataClim",
+            "field": "date"
+          },
+          {
+            "resource": "dataClim",
+            "field": "maxtemp"
+          }
+        ]
+      },
+      {
+        "name": "mintemp",
+        "data": [
+          {
+            "resource": "dataClim",
+            "field": "date"
+          },
+          {
+            "resource": "dataClim",
+            "field": "mintemp"
+          }
+        ]
+      },
+      {
+        "name": "rain",
+        "data": [
+          {
+            "resource": "dataClim",
+            "field": "date"
+          },
+          {
+            "resource": "dataClim",
+            "field": "rain"
+          }
+        ]
+      },
+      {
+        "name": "humidity",
+        "data": [
+          {
+            "resource": "dataClim",
+            "field": "date"
+          },
+          {
+            "resource": "dataClim",
+            "field": "humidity"
+          }
+        ]
+      },
+      {
+        "name": "beta",
+        "description": "transmission rate",
+        "data": {
+          "resource": "beta"
+        }
+      },
+      {
+        "name": "i",
+        "description": "immigration",
+        "data": {
+          "resource": "pr_i"
+        },
+        "transformation": "pow(10,pr_i)",
+        "to_resource": "log(i)/log(10)"
+      },
+      {
+        "name": "gamma",
+        "description": "recovery rate",
+        "data": {
+          "resource": "gamma_inv"
+        },
+        "transformation": "1/gamma_inv",
+        "to_resource": "1/gamma"
+      },
+      {
+        "name": "alpha",
+        "description": "loss of immunity rate",
+        "data": {
+          "resource": "alpha_inv"
+        },
+        "transformation": "1/alpha_inv",
+        "to_resource": "1/alpha"
+      },
+      {
+        "name": "e",
+        "description": "amplitude of seasonal forcing",
+        "data": {
+          "resource": "e"
+        }
+      },
+      {
+        "name": "d",
+        "description": "Seasonal forcing phase",
+        "data": {
+          "resource": "d"
+        }
+      },
+      {
+        "name": "S",
+        "description": "initial size of S",
+        "data": {
+          "resource": "pr_S"
+        },
+        "transformation": "pr_S*N",
+        "to_resource": "S/N"
+      },
+      {
+        "name": "I",
+        "description": "initial size of I",
+        "data": {
+          "resource": "pr_I"
+        },
+        "transformation": "pr_I*N",
+        "to_resource": "I/N"
+      },
+      {
+        "name": "mu_b",
+        "description": "birth rate",
+        "data": {
+          "resource": "mu_b"
+        }
+      },
+      {
+        "name": "mu_d",
+        "description": "death rate",
+        "data": {
+          "resource": "mu_d"
+        }
+      },
+      {
+        "name": "phi",
+        "description": "over-dispersion",
+        "data": {
+          "resource": "phi"
+        }
+      },
+      {
+        "name": "rep",
+        "description": "over-dispersion",
+        "data": {
+          "resource": "rep"
+        }
+      }
+    ]
+  },
+  "resources": [
+    {
+      "name": "dataPop",
+      "path": "data/dataPop.csv",
+      "format": "csv",
+      "schema": {
+        "fields": [
+          {
+            "name": "date",
+            "type": "date"
+          },
+          {
+            "name": "Chaiyaphum",
+            "type": "number"
+          }
+        ]
+      }
+    },
+    {
+      "name": "dataEpi",
+      "path": "data/dataEpi.csv",
+      "format": "csv",
+      "schema": {
+        "fields": [
+          {
+            "name": "date",
+            "type": "date"
+          },
+          {
+            "name": "Chaiyaphum",
+            "type": "number"
+          }
+        ]
+      }
+    },
+    {
+      "name": "dataClim",
+      "path": "data/dataClim_Chaiyaphum.csv",
+      "format": "csv",
+      "schema": {
+        "fields": [
+          {
+            "name": "date",
+            "type": "date"
+          },
+          {
+            "name": "maxtemp",
+            "type": "number"
+          },
+          {
+            "name": "mintemp",
+            "type": "number"
+          },
+          {
+            "name": "rain",
+            "type": "number"
+          },
+          {
+            "name": "humidity",
+            "type": "number"
+          }
+        ]
+      }
+    },
+    {
+      "name": "pr_S",
+      "description": "initial size of S",
+      "data": {
+        "distribution": "uniform",
+        "lower": 0.8,
+        "upper": 0.95
+      }
+    },
+    {
+      "name": "pr_I",
+      "description": "initial size of I",
+      "data": {
+        "distribution": "uniform",
+        "lower": 0,
+        "upper": 0.1
+      }
+    },
+    {
+      "name": "mu_d",
+      "description": "death rate",
+      "data": {
+        "distribution": "fixed",
+        "value": 0.001282051
+      }
+    },
+    {
+      "name": "mu_b",
+      "description": "birth rate",
+      "data": {
+        "distribution": "fixed",
+        "value": 0.001282051
+      }
+    },
+    {
+      "name": "beta",
+      "description": "transmission rate",
+      "data": {
+        "distribution": "uniform",
+        "upper": 1,
+        "lower": 0
+      }
+    },
+    {
+      "name": "pr_i",
+      "description": "immigration rate",
+      "data": {
+        "distribution": "uniform",
+        "lower": 0,
+        "upper": 4
+      }
+    },
+    {
+      "name": "gamma_inv",
+      "description": "inverse of recovery rate",
+      "data": {
+        "distribution": "uniform",
+        "lower": 0,
+        "upper": 20,
+        "unit": "days"
+      }
+    },
+    {
+      "name": "alpha_inv",
+      "description": "cross immunity duration",
+      "data": {
+        "distribution": "uniform",
+        "upper": 1200,
+        "lower": 60,
+        "unit": "days"
+      }
+    },
+    {
+      "name": "e",
+      "description": "seasonal forcing amplitude",
+      "data": {
+        "distribution": "uniform",
+        "lower": 0,
+        "upper": 0.6
+      }
+    },
+    {
+      "name": "d",
+      "description": "Seasonal forcing phase",
+      "data": {
+        "distribution": "uniform",
+        "lower": 0,
+        "upper": 1
+      }
+    },
+    {
+      "name": "phi",
+      "description": "over-dispersion",
+      "data": {
+        "distribution": "fixed",
+        "value": 0.2
+      }
+    },
+    {
+      "name": "rep",
+      "description": "over-dispersion",
+      "data": {
+        "distribution": "uniform",
+        "lower": 0,
+        "upper": 0.05
+      }
+    },
+    {
+      "name": "values",
+      "format": "json",
+      "data": {
+        "pr_S": 0.9,
+        "pr_I": 0.000001,
+        "beta": 0.2,
+        "pr_i": 2,
+        "d": 0.58,
+        "gamma_inv": 3.7,
+        "alpha_inv": 180,
+        "e": 0.17,
+        "rep": 0.001
+      }
+    },
+    {
+      "name": "covariance",
+      "format": "json",
+      "data": {
+        "pr_S": {
+          "pr_S": 0.04
+        },
+        "pr_I": {
+          "pr_I": 0.04
+        },
+        "beta": {
+          "beta": 0.04
+        },
+        "pr_i": {
+          "pr_i": 0.04
+        },
+        "d": {
+          "d": 0.02
+        },
+        "gamma_inv": {
+          "gamma_inv": 0.04
+        },
+        "alpha_inv": {
+          "alpha_inv": 0.02
+        },
+        "e": {
+          "e": 0.02
+        },
+        "rep": {
+          "rep": 0.02
+        }
+      }
+    },
+    {
+      "name": "lhs",
+      "path": "./results/lhs/lhs.json",
+      "format": "json"
+    },
+    {
+      "name": "mle",
+      "path": "./results/lhs_simplex/mle.json",
+      "format": "json"
+    },
+    {
+      "name": "hat_0",
+      "path": "./results/fit/hat_0.csv",
+      "format": "csv"
+    },
+    {
+      "name": "X_0",
+      "path": "./results/fit/X_0.csv",
+      "format": "csv"
+    }
+  ],
+  "analytics": [
+    {
+      "name": "random-lhs",
+      "run": [
+        {
+          "command": "ssm lhs $IN.dpkg -o $OUT.out --samples 10 -t 100",
+          "timeout": "00:01:00",
+          "inputs": [
+            {
+              "path": "package.json",
+              "name": "dpkg"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "results/lhs/lhs.json",
+              "save": {
+                "resource": "lhs"
+              },
+              "name": "out"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "lhs-simplex",
+      "map": [
+        {
+          "command": "./simul",
+          "args": [
+            "--root",
+            "$ROOT/results/lhs_simplex",
+            "--next",
+            "mle_",
+            "--id",
+            "$ID",
+            "--end",
+            "2010-01-01"
+          ],
+          "cwd": "bin",
+          "timeout": "00:00:05",
+          "inputs": [
+            {
+              "resource": "lhs",
+              "collection": true,
+              "stdin": true
+            }
+          ],
+          "outputs": [
+            {
+              "path": "results/lhs_simplex/mle_*.json"
+            }
+          ]
+        },
+        {
+          "repeat": 3,
+          "command": "./ksimplex",
+          "args": [
+            "--root",
+            "$ROOT/results/lhs_simplex",
+            "-M",
+            10000,
+            "--next",
+            "mle_",
+            "--id",
+            "$ID"
+          ],
+          "cwd": "bin",
+          "timeout": "00:03:00",
+          "inputs": [
+            {
+              "path": "results/lhs_simplex/mle_*.json",
+              "stdin": true
+            }
+          ],
+          "outputs": [
+            {
+              "path": "results/lhs_simplex/mle_*.json"
+            }
+          ]
+        }
+      ],
+      "reduce": [
+        {
+          "command": "ssm reduce $ROOT/results/lhs_simplex --by log_ltp --summary $OUT.out",
+          "timeout": "00:01:00",
+          "inputs": [
+            {
+              "path": "results/lhs_simplex/mle_*.json"
+            }
+          ],
+          "outputs": [
+            {
+              "path": "results/lhs_simplex/mle.json",
+              "save": {
+                "resource": "mle"
+              },
+              "name": "out"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "fit",
+      "run": [
+        {
+          "command": "cat $ROOT/results/lhs_simplex/mle.json  | ./kalman --root $ROOT/results/fit --hat --traj",
+          "cwd": "bin",
+          "timeout": "00:00:00",
+          "inputs": [
+            {
+              "resource": "mle",
+              "name": "out",
+              "stdin": true
+            }
+          ],
+          "outputs": [
+            {
+              "path": "results/fit/hat_0.csv",
+              "save": {
+                "resource": "hat_0"
+              }
+            },
+            {
+              "path": "results/fit/X_0.csv",
+              "save": {
+                "resource": "X_0"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
