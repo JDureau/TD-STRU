@@ -506,7 +506,7 @@
       "name": "random-lhs",
       "run": [
         {
-          "command": "ssm lhs $IN.dpkg -o $OUT.out --samples 10 -t 100",
+          "command": "ssm lhs $IN.dpkg -o $OUT.out --samples 30 -t 10000000",
           "timeout": "00:01:00",
           "inputs": [
             {

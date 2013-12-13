@@ -81,23 +81,20 @@
     "data": [
       {
         "name": "cases",
-        "data": [
-          {
-            "resource": "data",
-            "field": "date"
-          },
-          {
-            "resource": "data",
-            "field": "cases"
-          }
-        ]
+        "require": {
+          "resource": "data",
+          "fields": [
+            "date",
+            "cases"
+          ]
+        }
       }
     ],
     "inputs": [
       {
         "name": "beta",
         "description": "transmission rate",
-        "data": {
+        "require": {
           "resource": "r0"
         },
         "transformation": "r0/mu_inv"
@@ -105,14 +102,14 @@
       {
         "name": "N",
         "description": "pop size",
-        "data": {
+        "require": {
           "resource": "N"
         }
       },
       {
         "name": "eps",
         "description": "rate leaving E",
-        "data": {
+        "require": {
           "resource": "eps_inv"
         },
         "transformation": "1/eps_inv"
@@ -120,7 +117,7 @@
       {
         "name": "mu",
         "description": "recovery rate",
-        "data": {
+        "require": {
           "resource": "mu_inv"
         },
         "transformation": "1/mu_inv"
@@ -128,7 +125,7 @@
       {
         "name": "gamma",
         "description": "rate leaving R",
-        "data": {
+        "require": {
           "resource": "gamma_inv"
         },
         "transformation": "1/gamma_inv"
@@ -136,7 +133,7 @@
       {
         "name": "tau",
         "description": "rate leaving W",
-        "data": {
+        "require": {
           "resource": "tau_inv"
         },
         "transformation": "1/tau_inv"
@@ -144,42 +141,42 @@
       {
         "name": "rep",
         "description": "reporting rate",
-        "data": {
+        "require": {
           "resource": "rep"
         }
       },
       {
         "name": "S",
         "description": "initial size of S",
-        "data": {
+        "require": {
           "resource": "S"
         }
       },
       {
         "name": "E",
         "description": "initial size of E",
-        "data": {
+        "require": {
           "resource": "E"
         }
       },
       {
         "name": "I",
         "description": "initial size of I",
-        "data": {
+        "require": {
           "resource": "I"
         }
       },
       {
         "name": "R",
         "description": "initial size of R",
-        "data": {
+        "require": {
           "resource": "R"
         }
       },
       {
         "name": "W",
         "description": "initial size of W",
-        "data": {
+        "require": {
           "resource": "W"
         }
       },

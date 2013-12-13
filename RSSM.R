@@ -6,7 +6,7 @@
 
 
 
-ssm.plot.hat <- function(hatpath,packagepath,plotdata=0){
+ssm.plot.hat <- function(hatpath,packagepath,plotdata=1){
   hat <- as.data.frame(read.csv(paste(packagepath,hatpath,sep=""), header = TRUE))
   data <- import.data(packagepath)
   names = names(hat)
@@ -38,7 +38,7 @@ ssm.plot.hat <- function(hatpath,packagepath,plotdata=0){
 }
 
 
-ssm.plot.X <- function(Xpath,packagepath,plotdata=0){	
+ssm.plot.X <- function(Xpath,packagepath,plotdata=1){	
   X <- as.data.frame(read.csv(paste(packagepath,Xpath,sep=""), header = TRUE))
   data <- import.data(packagepath)
   names = names(X)
@@ -104,6 +104,7 @@ ssm.plot.scatter <- function(tracepath,packagepath){
 }
 
 
+
 import.data <- function(packagepath){
   json_file <- fromJSON(paste(packagepath,'/bin/.data.json',sep=""))
   dates = rep('',length(json_file$data)-1)
@@ -122,9 +123,12 @@ import.data <- function(packagepath){
       data = rbind(data,rep(NaN,nmax+1))
     }
     data[i,1] = json_file$data[[i]]$date
-    for(j in 1:length(json_file$data[[i]]$observed)){
-      data[i,json_file$data[[i]]$observed[j]+2] = json_file$data[[i]]$values[j]*1.0
+    if (length(json_file$data[[i]]$observed)){
+    	for(j in 1:length(json_file$data[[i]]$observed)){
+      		data[i,json_file$data[[i]]$observed[j]+2] = json_file$data[[i]]$values[j]*1.0
+      	}
     } 
+
   }
   return(data)
 }

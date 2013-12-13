@@ -92,29 +92,23 @@
     "data": [
       {
         "name": "london_observed_deaths",
-        "data": [
-          {
-            "resource": "data",
-            "field": "date"
-          },
-          {
-            "resource": "data",
-            "field": "london_observed_deaths"
-          }
-        ]
+        "require": {
+          "resource": "data",
+          "fields": [
+            "date",
+            "london_observed_deaths"
+          ]
+        }
       },
       {
         "name": "eyam_observed_deaths",
-        "data": [
-          {
-            "resource": "data",
-            "field": "date"
-          },
-          {
-            "resource": "data",
-            "field": "eyam_observed_deaths"
-          }
-        ]
+        "require": {
+          "resource": "data",
+          "fields": [
+            "date",
+            "eyam_observed_deaths"
+          ]
+        }
       }
     ],
     "inputs": [
@@ -123,7 +117,7 @@
         "description": "Number of initially susceptibles in London",
         "transformation": "pr_S_london*N_london",
         "to_resource": "S_london/N_london",
-        "data": {
+        "require": {
           "resource": "pr_S_london"
         }
       },
@@ -132,7 +126,7 @@
         "description": "Number of initially susceptibles in Eyam",
         "transformation": "pr_S_eyam*N_eyam",
         "to_resource": "S_eyam/N_eyam",
-        "data": {
+        "require": {
           "resource": "pr_S_eyam"
         }
       },
@@ -149,42 +143,42 @@
       {
         "name": "N_london",
         "description": "Initial population size in London",
-        "data": {
+        "require": {
           "resource": "N_london"
         }
       },
       {
         "name": "N_eyam",
         "description": "Initial population size in Eyam",
-        "data": {
+        "require": {
           "resource": "N_eyam"
         }
       },
       {
         "name": "e",
         "description": "Seasonal forcing amplitude",
-        "data": {
+        "require": {
           "resource": "e"
         }
       },
       {
         "name": "d",
         "description": "Seasonal forcing phase",
-        "data": {
+        "require": {
           "resource": "d"
         }
       },
       {
         "name": "r0_london",
         "description": "Plague reproduction rate in London",
-        "data": {
+        "require": {
           "resource": "r0_london"
         }
       },
       {
         "name": "r0_eyam",
         "description": "Plague reproduction rate in Eyam",
-        "data": {
+        "require": {
           "resource": "r0_eyam"
         }
       },
@@ -193,28 +187,28 @@
         "description": "Death rate",
         "transformation": "1/life_exp",
         "to_resource": "1/mu_d",
-        "data": {
+        "require": {
           "resource": "life_exp"
         }
       },
       {
         "name": "rep_london",
         "description": "Reporting rate in London",
-        "data": {
+        "require": {
           "resource": "rep_london"
         }
       },
       {
         "name": "rep_eyam",
         "description": "Reporting rate in Eyam",
-        "data": {
+        "require": {
           "resource": "rep_eyam"
         }
       },
       {
         "name": "phi",
         "description": "over-dispersion",
-        "data": {
+        "require": {
           "resource": "phi"
         }
       }
@@ -551,7 +545,7 @@
             "--root",
             "$ROOT/results/pmcmc",
             "-M",
-            500000,
+            1000000,
             "--next",
             "map_",
             "--id",
@@ -573,7 +567,7 @@
           ]
         },
         {
-          "repeat": 1,
+          "repeat": 2,
           "command": "./pmcmc",
           "args": [
             "--root",
